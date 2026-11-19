@@ -1,0 +1,42 @@
+{
+  "id": "./",
+  "name": "सरपंच स्मैश",
+  "short_name": "सरपंच स्मैश",
+  "description": "पंचायत चुनाव पर बना व्यंग्य वाला 2D फाइटिंग गेम — ऑनलाइन या कंप्यूटर से भिड़ो।",
+  "lang": "hi",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#1a1024",
+  "theme_color": "#e8590c",
+  "categories": [
+    "games"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

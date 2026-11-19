@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>सरपंच स्मैश — वोट दो या चोट खाओ</title>
+<meta name="description" content="गाँव के पंचायत चुनाव पर बना व्यंग्य वाला 2D फाइटिंग गेम। दोस्तों के साथ ऑनलाइन या कंप्यूटर से भिड़ो।">
+<meta name="theme-color" content="#e8590c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="सरपंच स्मैश">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+<div id="stage"><canvas id="cv" width="800" height="400"></canvas></div>
+<div id="pad">
+<div class="cl"><button class="j" data-k="J">⤒<small>कूदो</small></button><button data-k="L" aria-label="बाएँ">◀</button><button data-k="R" aria-label="दाएँ">▶</button></div>
+<div class="cr"><button data-k="P">👊<small>पंच</small></button><button data-k="K">🦶<small>किक</small></button><button data-k="B">🛡️<small>ब्लॉक</small></button><button data-k="S">⭐<small>स्पेशल</small></button></div>
+</div>
+<button id="lv" hidden>✖ छोड़ो</button><div id="ov"></div>
+</div>
+<script src="lib/peerjs.min.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
