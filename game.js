@@ -17,7 +17,7 @@ let NET=null,NETSIDE=0,TKN=0,TMR=0,PEERS=[],CONN=null,DP=null;const lv=$('#lv');
 function place(){const r=cv.getBoundingClientRect();lv.style.left=(r.left+r.width/2)+'px';lv.style.top=(r.top+r.height*.2)+'px';lv.hidden=ov.style.display=='flex'||!P}
 function wait(h,s,e2=''){G.s='menu';ov.style.display='flex';ov.innerHTML=`<h2>${h}</h2><p>${s}</p>${e2}<div class='row'><button class='bt' data-g='x'>रद्द करो</button></div>`}
 function bye(m){stopNet();G.s='menu';ov.style.display='flex';ov.innerHTML=`<h2 style='font-size:clamp(20px,5vw,32px)'>${m}</h2><div class='row'><button class='bt' data-g='f'>फिर से ढूँढो</button><button class='bt' data-g='m'>होम</button></div>`}
-function menu(){G.s='menu';ov.style.display='flex';ov.innerHTML=`<h1>सरपंच स्मैश</h1><p>वोट दो या चोट खाओ 🗳️👊</p><div class='cards'><button class='oc' data-g='f'><b>⚔️</b>फाइट करो<span>ऑनलाइन खिलाड़ी मिला तो उससे, वरना कंप्यूटर से</span></button><button class='oc' data-g='c'><b>🏠</b>पर्सनल रूम बनाओ<span>रैंडम कोड दोस्त को भेजो</span></button></div><div class='row'><input id='cd' maxlength='5' placeholder='रूम कोड' autocomplete='off'><button class='bt' data-g='j'>रूम में जुड़ो</button></div><p class='sm'>फ़ोन आड़ा करो • कीबोर्ड: A/D चलो, W कूदो, J पंच, K किक, L ब्लॉक, U स्पेशल<br>सारे पात्र और घटनाएँ काल्पनिक हैं 😄</p><button class='bt' data-g='i' id='ib'${DP?'':' hidden'}>📲 फ़ोन में इंस्टॉल करो</button>`}
+function menu(){G.s='menu';setTimeout(probe,0);ov.style.display='flex';ov.innerHTML=`<h1>सरपंच स्मैश</h1><p>वोट दो या चोट खाओ 🗳️👊</p><div class='cards'><button class='oc' data-g='f'><b>⚔️</b>फाइट करो<span>ऑनलाइन खिलाड़ी मिला तो उससे, वरना कंप्यूटर से</span></button><button class='oc' data-g='c'><b>🏠</b>पर्सनल रूम बनाओ<span>रैंडम कोड दोस्त को भेजो</span></button></div><div class='row'><input id='cd' maxlength='5' placeholder='रूम कोड' autocomplete='off'><button class='bt' data-g='j'>रूम में जुड़ो</button></div><p class='sm'>फ़ोन आड़ा करो • कीबोर्ड: A/D चलो, W कूदो, J पंच, K किक, L ब्लॉक, U स्पेशल<br>सारे पात्र और घटनाएँ काल्पनिक हैं 😄</p><p class='sm' id='st'>${stat()}</p><button class='bt' data-g='i' id='ib'${DP?'':' hidden'}>📲 फ़ोन में इंस्टॉल करो</button>`}
 function cpu(){stopNet();go(Math.random()*3|0);txt(400,270,'कोई ऑनलाइन खिलाड़ी नहीं मिला — कंप्यूटर से भिड़ंत 🤖',16)}
 /* ===== ऑनलाइन मल्टीप्लेयर: PeerJS (WebRTC) =====
    क्विक मैच: 4 "स्लॉट" आईडी (q0-q3). खाली स्लॉट पर इंतज़ार करो, भरे स्लॉट से जुड़ जाओ.
@@ -26,7 +26,12 @@ const PFX='sarpanchsmash-v1-',PO={debug:0,config:{iceServers:[{urls:'stun:stun.l
 const num=(v,a,b,z=0)=>{v=+v;return v>=a&&v<=b?v:z};
 const ST=['idle','atk','stun','ko'],KK=['','P','K','S','D'];
 function stopNet(){TKN++;clearTimeout(TMR);NETSIDE=0;NET=null;CONN=null;PEERS.forEach(p=>{try{p.destroy()}catch(e){}});PEERS=[]}
-function mkPeer(id){return new Promise((ok,no)=>{if(typeof Peer=='undefined')return no({type:'nolib'});const p=id?new Peer(id,PO):new Peer(PO);p.on('open',()=>ok(p));p.on('error',no);p.on('disconnected',()=>{try{p.reconnect()}catch(e){}})})}
+function mkPeer(id){return new Promise((ok,no)=>{if(typeof Peer=='undefined')return no({type:'nolib'});let p,d=0;const t=setTimeout(()=>{if(!d){d=1;try{p.destroy()}catch(e){}no({type:'timeout'})}},9000);
+p=id?new Peer(id,PO):new Peer(PO);p.on('open',()=>{if(!d){d=1;clearTimeout(t);ok(p)}});p.on('error',e=>{if(!d){d=1;clearTimeout(t);try{p.destroy()}catch(_){}no(e)}});p.on('disconnected',()=>{try{p.reconnect()}catch(e){}})})}
+const why=e=>{const t=e&&e.type||'unknown';return t=='nolib'?'PeerJS फ़ाइल लोड नहीं हुई ❌ (lib फ़ोल्डर देखो)':'सर्वर से कनेक्ट नहीं हो सका 😕 (कारण: '+t+')'};
+let ONL=null,PB=0;
+const stat=()=>!ONL||ONL==='…'?'🌐 ऑनलाइन: जाँच रहे हैं…':ONL.ok?'🌐 ऑनलाइन: चालू ✅':'🌐 ऑनलाइन: बंद ❌ — '+why(ONL.e);
+async function probe(){if(PB||(ONL&&ONL.ok))return;PB=1;ONL='…';const s=$('#st');if(s)s.textContent=stat();try{const p=await mkPeer();p.destroy();ONL={ok:1}}catch(e){ONL={ok:0,e}}PB=0;const t=$('#st');if(t)t.textContent=stat()}
 function dial(p,id){return new Promise(ok=>{let d=0;const c=p.connect(id,{serialization:'json'}),fin=r=>{if(d)return;d=1;clearTimeout(t);p.off('error',h);if(!r)try{c.close()}catch(e){}ok(r?c:null)},h=e=>{if(e&&e.type=='peer-unavailable')fin(0)},t=setTimeout(()=>fin(0),3500);p.on('error',h);c.on('open',()=>fin(1))})}
 function begin(s,oi){const B=OPP[oi];NETSIDE=s;P=mk(s?B:ME,s?-1:1);O=mk(s?ME:B,s?1:-1);G.rn=1;ov.style.display='none';rnd()}
 function link(c,side,my,mode){
@@ -57,14 +62,14 @@ TMR=setTimeout(()=>{if(my==TKN&&!CONN)cpu()},8000);return}
 cpu()}
 async function create(){stopNet();const my=++TKN;wait('रूम बना रहे हैं…','');const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 for(let t=0;t<5;t++){let c='';for(let i=0;i<5;i++)c+=A[Math.random()*A.length|0];let h;
-try{h=await mkPeer(PFX+'r'+c.toLowerCase())}catch(e){if(my!=TKN)return;if(e&&e.type=='unavailable-id')continue;return bye('सर्वर से कनेक्ट नहीं हो सका 😕')}
+try{h=await mkPeer(PFX+'r'+c.toLowerCase())}catch(e){if(my!=TKN)return;if(e&&e.type=='unavailable-id')continue;return bye(why(e))}
 if(my!=TKN){h.destroy();return}PEERS.push(h);
 h.on('connection',cn=>{if(CONN||my!=TKN){cn.close();return}cn.on('open',()=>{if(!CONN&&my==TKN)link(cn,0,my,1);else cn.close()})});
 return wait('तुम्हारा रूम कोड','दोस्त को भेजो, वो “रूम में जुड़ो” में डालेगा। उसके आते ही गेम शुरू!',`<h1 style='letter-spacing:6px'>${c}</h1>`)}
 bye('रूम नहीं बन सका, फिर कोशिश करो')}
 async function joinR(){const c=($('#cd').value||'').toLowerCase().replace(/[^a-z0-9]/g,'');if(c.length!=5){$('#cd').focus();return}
 stopNet();const my=++TKN;wait('रूम में जा रहे हैं…','कोड: '+c.toUpperCase());
-let me;try{me=await mkPeer()}catch(e){if(my==TKN)bye('सर्वर से कनेक्ट नहीं हो सका 😕');return}
+let me;try{me=await mkPeer()}catch(e){if(my==TKN)bye(why(e));return}
 if(my!=TKN){me.destroy();return}PEERS.push(me);
 const cn=await dial(me,PFX+'r'+c);if(my!=TKN)return;if(!cn)return bye('ऐसा कोई रूम नहीं मिला 😕');link(cn,1,my,1)}
 function over(){G.s='over';const w=P.w>=2;ov.style.display='flex';ov.innerHTML=`<h2>${w?'सरपंच बन गए! 🎉':'ज़मानत ज़ब्त! 💀'}</h2><p>${w?O.n+' चारों खाने चित! पहला आदेश: चौपाल पर फ्री Wi-Fi और रील बनाने की छूट। Aura +9999':'NOTA भी तुमसे आगे निकल गया। Aura -1000, पर वापसी पक्की।'}</p><div class="row"><button class="bt" data-g="r">फिर से लड़ो</button><button class="bt" data-g="m">होम</button></div>`}
