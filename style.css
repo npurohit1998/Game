@@ -28,7 +28,9 @@ canvas{display:block}
 #ov p{margin:0;font-size:clamp(13px,3.2vw,18px);max-width:560px}
 #ov .sm{opacity:.75;font-size:12px}
 #lv{position:fixed;z-index:4;transform:translateX(-50%);font:600 12px 'Baloo 2',sans-serif;padding:2px 12px;border-radius:12px;border:2px solid var(--bt);background:var(--b2);color:var(--bt);opacity:.85;touch-action:manipulation}
-#cd{font:800 18px 'Baloo 2',sans-serif;width:110px;text-align:center;text-transform:uppercase;border:3px solid var(--bt);border-radius:12px;padding:6px;user-select:text;-webkit-user-select:text;touch-action:manipulation}
+#cd,#nm{font:800 18px 'Baloo 2',sans-serif;width:110px;text-align:center;text-transform:uppercase;border:3px solid var(--bt);border-radius:12px;padding:6px;user-select:text;-webkit-user-select:text;touch-action:manipulation}
 .cards,.row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .oc,.bt{font:600 14px "Baloo 2",sans-serif;background:var(--b1);color:var(--bt);border:3px solid var(--bt);border-radius:14px;padding:8px 12px;cursor:pointer;touch-action:manipulation}
 .oc{width:150px}.oc b{display:block;font-size:34px}.oc span{display:block;font-size:12px;font-weight:600}
+.fc{width:120px;height:120px;border-radius:50%;border:4px solid #ffd166;object-fit:cover;background:#2b1a3d}
+#cam{transform:scaleX(-1)}
