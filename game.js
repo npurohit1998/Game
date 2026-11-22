@@ -12,12 +12,12 @@ const K={L:0,R:0,B:0},bg=document.createElement('canvas');bg.width=W;bg.height=H
 const txt=(a,b,s,z=18)=>TX.push({x:Math.max(80,Math.min(W-80,a)),y:b,s,sz:z,t:1});
 const mk=(b,f)=>({...b,x:0,y:GY,vx:0,vy:0,f,hp:100,m:0,st:'idle',at:0,ad:0,k:'',did:0,stn:0,hit:0,b:0,q:'',qt:0,w:0,I:{L:0,R:0,B:0},ai:.6});
 function rnd(){P.x=NETSIDE?580:220;O.x=NETSIDE?220:580;P.f=NETSIDE?-1:1;O.f=-P.f;[P,O].forEach(f=>{f.y=GY;f.vx=f.vy=f.hit=0;f.hp=100;f.m=0;f.st='idle';f.q='';f.b=0;f.I={L:0,R:0,B:0}});PR=[];TX=[];G.s='intro';G.t=0;G.time=40}
-function go(i){G.oi=i;P=mk(ME,1);O=mk(OPP[i],-1);G.rn=1;ov.style.display='none';rnd()}
+function go(i){G.oi=i;P=mk(ME,1);O=mk(OPP[i],-1);P.n=PROF.n||ME.n;P.img=MYIMG;G.rn=1;ov.style.display='none';rnd()}
 let NET=null,NETSIDE=0,TKN=0,TMR=0,PEERS=[],CONN=null,DP=null;const lv=$('#lv');
 function place(){const r=cv.getBoundingClientRect();lv.style.left=(r.left+r.width/2)+'px';lv.style.top=(r.top+r.height*.2)+'px';lv.hidden=ov.style.display=='flex'||!P}
 function wait(h,s,e2=''){G.s='menu';ov.style.display='flex';ov.innerHTML=`<h2>${h}</h2><p>${s}</p>${e2}<div class='row'><button class='bt' data-g='x'>रद्द करो</button></div>`}
-function bye(m){stopNet();G.s='menu';ov.style.display='flex';ov.innerHTML=`<h2 style='font-size:clamp(20px,5vw,32px)'>${m}</h2><div class='row'><button class='bt' data-g='f'>फिर से ढूँढो</button><button class='bt' data-g='m'>होम</button></div>`}
-function menu(){G.s='menu';setTimeout(probe,0);ov.style.display='flex';ov.innerHTML=`<h1>सरपंच स्मैश</h1><p>वोट दो या चोट खाओ 🗳️👊</p><div class='cards'><button class='oc' data-g='f'><b>⚔️</b>फाइट करो<span>ऑनलाइन खिलाड़ी मिला तो उससे, वरना कंप्यूटर से</span></button><button class='oc' data-g='c'><b>🏠</b>पर्सनल रूम बनाओ<span>रैंडम कोड दोस्त को भेजो</span></button></div><div class='row'><input id='cd' maxlength='5' placeholder='रूम कोड' autocomplete='off'><button class='bt' data-g='j'>रूम में जुड़ो</button></div><p class='sm'>फ़ोन आड़ा करो • कीबोर्ड: A/D चलो, W कूदो, J पंच, K किक, L ब्लॉक, U स्पेशल<br>सारे पात्र और घटनाएँ काल्पनिक हैं 😄</p><p class='sm' id='st'>${stat()}</p><button class='bt' data-g='i' id='ib'${DP?'':' hidden'}>📲 फ़ोन में इंस्टॉल करो</button>`}
+function bye(m){stopNet();G.s='menu';ov.style.display='flex';ov.innerHTML=`<h2 style='font-size:clamp(20px,5vw,32px)'>${m}</h2><div class='row'><button class='bt' data-g='r'>फिर से ढूँढो</button><button class='bt' data-g='m'>होम</button></div>`}
+function menu(){G.s='menu';setTimeout(probe,0);ov.style.display='flex';ov.innerHTML=`<h1>सरपंच स्मैश</h1><p>वोट दो या चोट खाओ 🗳️👊</p><div class='cards'><button class='oc' data-g='f'><b>⚔️</b>फाइट करो<span>ऑनलाइन खिलाड़ी मिला तो उससे, वरना कंप्यूटर से</span></button><button class='oc' data-g='c'><b>🏠</b>पर्सनल रूम बनाओ<span>रैंडम कोड दोस्त को भेजो</span></button></div><div class='row'><input id='cd' maxlength='5' placeholder='रूम कोड' autocomplete='off'><button class='bt' data-g='j'>रूम में जुड़ो</button></div><p class='sm'>फ़ोन आड़ा करो • कीबोर्ड: A/D चलो, W कूदो, J पंच, K किक, L ब्लॉक, U स्पेशल<br>सारे पात्र और घटनाएँ काल्पनिक हैं 😄</p><div class='row'><button class='bt' data-g='pf'>✏️ मेरा किरदार</button><button class='bt' data-g='sf'>👁️ सामने वाले की फ़ोटो: ${SHOWF?'चालू':'बंद'}</button></div><p class='sm' id='st'>${stat()}</p><button class='bt' data-g='i' id='ib'${DP?'':' hidden'}>📲 फ़ोन में इंस्टॉल करो</button>`}
 function cpu(){stopNet();go(Math.random()*3|0);txt(400,270,'कोई ऑनलाइन खिलाड़ी नहीं मिला — कंप्यूटर से भिड़ंत 🤖',16)}
 /* ===== ऑनलाइन मल्टीप्लेयर: PeerJS (WebRTC) =====
    क्विक मैच: 4 "स्लॉट" आईडी (q0-q3). खाली स्लॉट पर इंतज़ार करो, भरे स्लॉट से जुड़ जाओ.
@@ -25,6 +25,23 @@ function cpu(){stopNet();go(Math.random()*3|0);txt(400,270,'कोई ऑनल�
 const PFX='sarpanchsmash-v1-',PO={debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}]}};
 const num=(v,a,b,z=0)=>{v=+v;return v>=a&&v<=b?v:z};
 const ST=['idle','atk','stun','ko'],KK=['','P','K','S','D'];
+/* ===== प्रोफ़ाइल: नाम + सेल्फ़ी (फ़ोटो सिर्फ़ फ़ोन में सेव; मैच में P2P से सामने वाले को जाती है) ===== */
+const cn=s=>String(s||'').replace(/[<>&"'`\\\x00-\x1f]/g,'').slice(0,12);
+const okf=s=>typeof s=='string'&&s.length<14000&&/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(s);
+const loadImg=s=>{const i=new Image();i.src=s;return i};
+let NEXT='f',JC='',FDATA='',CAMS=null,MYIMG=null,PROF={n:'',f:''},SHOWF=true;
+try{const s=JSON.parse(localStorage.getItem('ss-prof')||'{}');PROF={n:cn(s.n),f:okf(s.f)?s.f:''};SHOWF=localStorage.getItem('ss-sf')!='0'}catch(e){}
+if(PROF.f)MYIMG=loadImg(PROF.f);
+function camOff(){if(CAMS){CAMS.getTracks().forEach(t=>t.stop());CAMS=null}}
+function fromSrc(el,w,h){const c=$('#fc'),s=Math.min(w,h);c.getContext('2d').drawImage(el,(w-s)/2,(h-s)/2,s,s,0,0,72,72);FDATA=c.toDataURL('image/jpeg',.6);c.hidden=false;$('#cam').hidden=true}
+async function camBtn(b){const v=$('#cam'),m=$('#pm');m.textContent='';
+if(!CAMS){try{CAMS=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}},audio:false});v.srcObject=CAMS;v.hidden=false;$('#fc').hidden=true;b.textContent='📸 फ़ोटो खींचो'}catch(e){m.textContent='कैमरा नहीं खुला — अनुमति दो या गैलरी से चुनो'}}
+else{fromSrc(v,v.videoWidth,v.videoHeight);camOff();b.textContent='📸 दोबारा खींचो'}}
+function ap(pf){if(!O)return;O.n=pf.n||'विरोधी';O.img=SHOWF?pf.img:null}
+function prof(nx){NEXT=nx;G.s='menu';ov.style.display='flex';FDATA=PROF.f;
+ov.innerHTML=`<h2 style='font-size:clamp(22px,6vw,36px)'>अपना किरदार बनाओ</h2><div class='row' style='align-items:center'><canvas id='fc' class='fc' width='72' height='72'></canvas><video id='cam' class='fc' playsinline muted autoplay hidden></video></div><input id='nm' maxlength='12' placeholder='तुम्हारा नाम' autocomplete='off'><div class='row'><button class='bt' data-g='cam'>📸 कैमरा खोलो</button><button class='bt' data-g='gal'>🖼️ गैलरी</button></div><input type='file' id='fi' accept='image/*' hidden><div class='row'><button class='bt' data-g='ok'>✔️ लड़ने चलो</button><button class='bt' data-g='m'>वापस</button></div><p class='sm' id='pm'></p><p class='sm'>फ़ोटो सिर्फ़ तुम्हारे फ़ोन में रहती है। मैच में सामने वाले को दिखती है, किसी सर्वर पर सेव नहीं होती। फ़ोटो न लो तो डिफ़ॉल्ट चेहरा रहेगा।</p>`;
+$('#nm').value=PROF.n;if(PROF.f){const i=loadImg(PROF.f);i.onload=()=>$('#fc').getContext('2d').drawImage(i,0,0,72,72)}
+$('#fi').onchange=e=>{const f=e.target.files[0];if(!f)return;camOff();const i=new Image();i.onload=()=>{fromSrc(i,i.naturalWidth,i.naturalHeight);URL.revokeObjectURL(i.src)};i.src=URL.createObjectURL(f)}}
 function stopNet(){TKN++;clearTimeout(TMR);NETSIDE=0;NET=null;CONN=null;PEERS.forEach(p=>{try{p.destroy()}catch(e){}});PEERS=[]}
 function mkPeer(id){return new Promise((ok,no)=>{if(typeof Peer=='undefined')return no({type:'nolib'});let p,d=0;const t=setTimeout(()=>{if(!d){d=1;try{p.destroy()}catch(e){}no({type:'timeout'})}},9000);
 p=id?new Peer(id,PO):new Peer(PO);p.on('open',()=>{if(!d){d=1;clearTimeout(t);ok(p)}});p.on('error',e=>{if(!d){d=1;clearTimeout(t);try{p.destroy()}catch(_){}no(e)}});p.on('disconnected',()=>{try{p.reconnect()}catch(e){}})})}
@@ -33,11 +50,12 @@ let ONL=null,PB=0;
 const stat=()=>!ONL||ONL==='…'?'🌐 ऑनलाइन: जाँच रहे हैं…':ONL.ok?'🌐 ऑनलाइन: चालू ✅':'🌐 ऑनलाइन: बंद ❌ — '+why(ONL.e);
 async function probe(){if(PB||(ONL&&ONL.ok))return;PB=1;ONL='…';const s=$('#st');if(s)s.textContent=stat();try{const p=await mkPeer();p.destroy();ONL={ok:1}}catch(e){ONL={ok:0,e}}PB=0;const t=$('#st');if(t)t.textContent=stat()}
 function dial(p,id){return new Promise(ok=>{let d=0;const c=p.connect(id,{serialization:'json'}),fin=r=>{if(d)return;d=1;clearTimeout(t);p.off('error',h);if(!r)try{c.close()}catch(e){}ok(r?c:null)},h=e=>{if(e&&e.type=='peer-unavailable')fin(0)},t=setTimeout(()=>fin(0),3500);p.on('error',h);c.on('open',()=>fin(1))})}
-function begin(s,oi){const B=OPP[oi];NETSIDE=s;P=mk(s?B:ME,s?-1:1);O=mk(s?ME:B,s?1:-1);G.rn=1;ov.style.display='none';rnd()}
+function begin(s){NETSIDE=s;const A={...ME,c:'#f72585'};P=mk(s?A:ME,s?-1:1);O=mk(s?ME:A,s?1:-1);P.n=PROF.n||ME.n;P.img=MYIMG;O.n='विरोधी';if(NET&&NET.pf)ap(NET.pf);G.rn=1;ov.style.display='none';rnd()}
 function link(c,side,my,mode){
 CONN=c;let on=0;const net={rs:null,acc:0,last:performance.now(),send(m){try{c.send(m)}catch(e){}},emit(t,d){this.send({t,d});return Promise.resolve()}};
-const quit=()=>{if(mode)bye('रूम भर चुका है या बंद हो गया 🚫');else cpu()};
+net.send({t:'p',n:PROF.n,f:PROF.f});const quit=()=>{if(mode)bye('रूम भर चुका है या बंद हो गया 🚫');else cpu()};
 c.on('data',m=>{if(CONN!==c||!m||typeof m!='object')return;net.last=performance.now();const d=m.d||{};
+if(m.t=='p'){const f=okf(m.f)?m.f:'';net.pf={n:cn(m.n),img:f?loadImg(f):null};if(NET===net)ap(net.pf);return}
 if(m.t=='go'&&side==1&&!on){on=1;clearTimeout(TMR);NET=net;begin(1,num(m.oi,0,2)|0)}
 else if(!on)return;
 else if(m.t=='s')net.rs={x:num(m.x,0,800,400),y:num(m.y,-300,340,340),vx:num(m.vx,-900,900),vy:num(m.vy,-900,900),f:m.f<0?-1:1,st:ST.includes(m.st)?m.st:'idle',k:KK.includes(m.k)?m.k:'',at:num(m.at,0,2),ad:num(m.ad,0,2,.5),hp:num(m.hp,0,100,100),m:num(m.m,0,100),b:m.b?1:0,sq:num(m.sq,-1,1),ht:m.ht?1:0};
@@ -67,7 +85,7 @@ if(my!=TKN){h.destroy();return}PEERS.push(h);
 h.on('connection',cn=>{if(CONN||my!=TKN){cn.close();return}cn.on('open',()=>{if(!CONN&&my==TKN)link(cn,0,my,1);else cn.close()})});
 return wait('तुम्हारा रूम कोड','दोस्त को भेजो, वो “रूम में जुड़ो” में डालेगा। उसके आते ही गेम शुरू!',`<h1 style='letter-spacing:6px'>${c}</h1>`)}
 bye('रूम नहीं बन सका, फिर कोशिश करो')}
-async function joinR(){const c=($('#cd').value||'').toLowerCase().replace(/[^a-z0-9]/g,'');if(c.length!=5){$('#cd').focus();return}
+async function joinR(){const c=JC;
 stopNet();const my=++TKN;wait('रूम में जा रहे हैं…','कोड: '+c.toUpperCase());
 let me;try{me=await mkPeer()}catch(e){if(my==TKN)bye(why(e));return}
 if(my!=TKN){me.destroy();return}PEERS.push(me);
@@ -166,7 +184,8 @@ if(id==0){L(-5,-68+bob,-5,-52+bob,2,'#fff');L(6,-68+bob,6,-52+bob,2,'#fff')}
 if(id==1)for(let i=0;i<7;i++)E(-18+i*6,-72+bob+(3-Math.abs(i-3))*4,5,5,i%2?'#ff9f1c':'#ffd60a');
 if(id==2){const c=`hsl(${TM*220%360},85%,55%)`;L(14,-72+bob,-8,-70+bob,9,c);L(-8,-70+bob,-24,-56+bob+Math.sin(TM*8)*3,7,c)}
 if(id==3){L(-8,-74+bob,6,-50+bob,3,'#111');E(7,-47+bob,10,8,'#333');E(9,-47+bob,4,4,'#9cf')}
-E(2,-96+bob,27,25,sk);
+E(2,-96+bob,27,25,sk);const ph=f.img&&f.img.complete&&f.img.naturalWidth>0;if(ph){x.save();x.beginPath();x.arc(2,-96+bob,26,0,7);x.clip();x.translate(2,0);x.scale(f.f,1);x.drawImage(f.img,-26,-122+bob,52,52);x.restore();x.beginPath();x.arc(2,-96+bob,26,0,7);x.strokeStyle=OL;x.lineWidth=3;x.stroke();if(ko||hi){x.font='22px serif';x.textAlign='center';x.fillText(ko?'💫':'💢',2,-126+bob)}}
+if(!ph){
 if(id==0){E(0,-114+bob,24,11,'#ff7f11');E(-25,-108+bob,13,4,'#ff7f11')}
 if(id==2){E(0,-115+bob,25,10,'#111');E(20,-119+bob,8,6,'#111')}
 if(id==3)E(0,-117+bob,22,9,'#fff');
@@ -180,7 +199,7 @@ if(ko)E(4,-82+bob,5,8,'#ff6b81');
 else if(k)E(5,-83+bob,8,k=='S'?11:6,'#5a0a0a');
 else if(hi)L(-3,-82+bob,12,-84+bob,3,OL);
 else{x.strokeStyle=OL;x.lineWidth=3;x.beginPath();x.arc(4,-90+bob,8,.3,2.8);x.stroke()}
-if(id==1)E(3,-90+bob,15,5,'#222');
+if(id==1)E(3,-90+bob,15,5,'#222');}
 L(14,-68+bob,hx,hy,9,f.c);const g=k=='P';E(hx,hy,g?11:7,g?11:7,g?'#e63946':sk);
 if(g){x.globalAlpha=.3;for(let i=1;i<4;i++)E(hx-i*ex*.2,hy,9,9,'#fff');x.globalAlpha=1}
 if(id==0&&!g&&!ko){x.font='20px serif';x.textAlign='center';x.fillText('📱',hx+4,hy+6)}
@@ -194,7 +213,7 @@ const w=300*f.hp/100;x.fillStyle=f.hp>50?'#7bd957':f.hp>25?'#ffd166':'#ef476f';
 d>0?x.fillRect(bx,24,w,16):x.fillRect(bx+300-w,24,w,16);
 const mw=300*f.m/100;x.fillStyle=f.m>=100&&Math.sin(TM*14)>0?'#fff':'#4cc9f0';
 d>0?x.fillRect(bx,44,mw,5):x.fillRect(bx+300-mw,44,mw,5);
-label(f.n+' '+f.e,d>0?bx:bx+300,17,15,'#fff',d>0?'left':'right');
+label(f.n+(f.img?'':' '+f.e),d>0?bx:bx+300,17,15,'#fff',d>0?'left':'right');
 x.font=`800 11px ${FN}`;x.textAlign='center';x.fillStyle='#1d1208';x.fillText(Math.ceil(f.hp)+'% जनसमर्थन',bx+150,36);
 x.font='16px serif';for(let i=0;i<2;i++){x.globalAlpha=i<f.w?1:.3;x.fillText('🗳️',d>0?bx+10+i*20:bx+290-i*20,68)}x.globalAlpha=1});
 x.fillStyle='rgba(0,0,0,.6)';x.beginPath();x.arc(400,34,22,0,7);x.fill();
@@ -238,6 +257,16 @@ document.addEventListener('contextmenu',e=>e.preventDefault());
 function fit(){const L=matchMedia('(orientation:landscape)').matches,h=L?stage.clientHeight:1e5;let cw=stage.clientWidth,ch=cw/2;if(ch>h){ch=h;cw=h*2}cv.style.width=cw+'px';cv.style.height=ch+'px'}
 addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));
 function frame(ts){const dt=Math.min(.033,(ts-(frame.l||ts))/1000);frame.l=ts;TM+=dt;if(HS>0)HS-=dt;else if(P)step(dt*(G.s=='rend'&&G.t<.6?.35:1));parts(dt);render();requestAnimationFrame(frame)}
-ov.onclick=e=>{const b=e.target.closest('[data-g]');if(!b)return;const g=b.dataset.g;if(g=='f'||g=='r')fight();else if(g=='c')create();else if(g=='j')joinR();else if(g=='m'||g=='x'){stopNet();menu()}else if(g=='i'&&DP){DP.prompt();DP=null;$('#ib').hidden=true}};lv.onclick=()=>{stopNet();menu()};addEventListener('beforeinstallprompt',e=>{e.preventDefault();DP=e;const b=$('#ib');if(b)b.hidden=false});
+ov.onclick=e=>{const b=e.target.closest('[data-g]');if(!b)return;const g=b.dataset.g;
+if(g=='cam')return camBtn(b);if(g=='gal'){$('#fi').click();return}
+camOff();
+if(g=='f'||g=='c')prof(g);
+else if(g=='j'){const c=($('#cd').value||'').toLowerCase().replace(/[^a-z0-9]/g,'');if(c.length!=5){$('#cd').focus();return}JC=c;prof('j')}
+else if(g=='pf')prof('m');
+else if(g=='sf'){SHOWF=!SHOWF;try{localStorage.setItem('ss-sf',SHOWF?'1':'0')}catch(_){}menu()}
+else if(g=='ok'){PROF={n:cn($('#nm').value)||'खिलाड़ी',f:FDATA};MYIMG=FDATA?loadImg(FDATA):null;try{localStorage.setItem('ss-prof',JSON.stringify(PROF))}catch(_){}({f:fight,c:create,j:joinR,m:menu})[NEXT]()}
+else if(g=='r')fight();
+else if(g=='m'||g=='x'){stopNet();menu()}
+else if(g=='i'&&DP){DP.prompt();DP=null;$('#ib').hidden=true}};lv.onclick=()=>{stopNet();menu()};addEventListener('beforeinstallprompt',e=>{e.preventDefault();DP=e;const b=$('#ib');if(b)b.hidden=false});
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 fit();mkbg();if(document.fonts)document.fonts.ready.then(mkbg);menu();requestAnimationFrame(frame);
